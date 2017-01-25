@@ -8,44 +8,11 @@
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 
-Servo front1, front2, back1, back2;
+Servo R2, L1, L2, R1;
 
 sensors_event_t event;
 
 String data = "";
-/*
-void setup() {
-  Serial.begin(9600);
-  Serial1.begin(9600);
-  
-  while(!Serial1){
-    ;
-  }
-  
-  front1.attach(4);
-  front2.attach(6);
-  back1.attach(8);
-  back2.attach(10);
-  pinMode(led, OUTPUT);
- 
-}
-
-void loop() {
-  
-  
-  while (Serial1.available() > 0) {
-    char c = Serial1.read();
-    Serial.println(c);    
-  }
-  
-  front1.write(136);
-  front2.write(56);
-  back1.write(136);
-  back2.write(56);
-  
-}
-
-*/
 
 void setup()
 {
@@ -68,6 +35,11 @@ void setup()
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     while(1);
   }
+
+  R2.attach(10);
+  L1.attach(8);
+  R1.attach(6);
+  L2.attach(4);
   
   delay(1000);
     
@@ -109,15 +81,26 @@ void testProcessData() {
         float current_angle = event.orientation.x;
         float opt_angle = current_angle - angle;
         while(opt_angle > event.orientation.x) {
-          //turn right
+          L1.write(180);
+          R2.write(180);
+          R1.write(180);
+          L2.write(180);
           bno.getEvent(&event);
         }
       } else {
         Serial.print("Magnitude: ");
         float mag = com.toFloat();
         Serial.println(mag);
-        //go forward for mag * 1000 
+        R1.write(0);
+        R2.write(0);
+        L1.write(180);
+        L2.write(180);
+        delay(mag * 1000);
       }
+      L1.write(96);
+      R2.write(96);
+      R1.write(96);
+      L2.write(96);
       delay(250);  
       // Find the next command in input string
       command = strtok(0, ",");

@@ -112,15 +112,13 @@ public class MainCanvas {
                a = preProcessData(a) + "f";
                System.out.println(a);
                
-               Arduino arduino = new Arduino("COM13", 9600); //enter the port name here, and ensure that Arduino is connected, otherwise exception will be thrown.
+               Arduino arduino = new Arduino("COM13", 9600); 
                arduino.openConnection();
                arduino.serialWrite(a, 1, 50);
                Thread t=
                   new Thread() {
                      public void run() {
-                     //the following line will keep this app alive for 1000 seconds,
-                     //waiting for events to occur and responding to them (printing incoming messages to console).
-                        try {Thread.sleep(1000000);} 
+                     try {Thread.sleep(1000000);} 
                         catch (InterruptedException ie) {}
                      }
                   };
