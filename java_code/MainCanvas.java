@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
+import arduino.*;
 
 public class MainCanvas {
     
@@ -108,7 +109,24 @@ public class MainCanvas {
             public void actionPerformed(ActionEvent e)
             {
                String a = getEncodedData();
-               System.out.println(preProcessData(a));
+               a = preProcessData(a) + "f";
+               System.out.println(a);
+               
+               Arduino arduino = new Arduino("COM13", 9600); //enter the port name here, and ensure that Arduino is connected, otherwise exception will be thrown.
+               arduino.openConnection();
+               arduino.serialWrite(a, 1, 50);
+               Thread t=
+                  new Thread() {
+                     public void run() {
+                     //the following line will keep this app alive for 1000 seconds,
+                     //waiting for events to occur and responding to them (printing incoming messages to console).
+                        try {Thread.sleep(1000000);} 
+                        catch (InterruptedException ie) {}
+                     }
+                  };
+               t.start();
+               
+               //arduino.closeConnection();
             }
          });
       optionsPanel.add(send);
@@ -154,7 +172,6 @@ public class MainCanvas {
     
    public static double round(double value, int places) {
       if (places < 0) throw new IllegalArgumentException();
-   
       long factor = (long) Math.pow(10, places);
       value = value * factor;
       long tmp = Math.round(value);
