@@ -7,6 +7,7 @@
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
+int rotations = 0;
 
 Servo R2, L1, L2, R1;
 
@@ -78,30 +79,26 @@ void testProcessData() {
         Serial.print("Turning Angle: ");
         float angle = com.toInt() / 1.0;
         Serial.println(angle);
-        
-        sensors_event_t event;
-        bno.getEvent(&event);
-        float current_angle = fmod(event.orientation.x + 5.0, 360.0);
+        float current_angle = getRobotAngle();
         float opt_angle = current_angle + angle + 5.0;
         Serial.print("Current Angle: ");
         Serial.println(current_angle);
         Serial.print("Opt: ");
         Serial.println(opt_angle);
         float delta = 0.0;
-        while(opt_angle > current_angle) {
-          sensors_event_t event1;
-          bno.getEvent(&event1);
-          float new_current_angle = event1.orientation.x;
-          delta = new_current_angle - current_angle;
+        float previous_angle = current_angle;
+        while(opt_angle > (previous_angle + 360.0 * rotations)) {
+          current_angle = getRobotAngle();
+          delta = current_angle - previous_angle;
+          if(delta > 180.0) {
+            rotations += 1;
+          }
           L1.write(180);
           R2.write(180);
           R1.write(180);
           L2.write(180);
-          sensors_event_t event1;
-          bno.getEvent(&event1);
-          current_angle = fmod(event1.orientation.x + 5.0, 360.0);
-          
-          Serial.println(current_angle);
+          previous_angle = getRobotAngle();
+          Serial.println(previous_angle);
         }
         
       } else {
@@ -124,5 +121,12 @@ void testProcessData() {
       // Find the next command in input string
       command = strtok(0, ",");
   }
+}
+
+float getRobotAngle() {
+  sensors_event_t event1;
+  bno.getEvent(&event1);
+  float current_angle = fmod(event1.orientation.x + 5.0, 360.0);
+  return current_angle;
 }
 
