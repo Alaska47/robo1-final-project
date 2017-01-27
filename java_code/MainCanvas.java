@@ -112,7 +112,7 @@ public class MainCanvas {
                a = preProcessData(a) + "f";
                System.out.println(a);
                
-               Arduino arduino = new Arduino("COM13", 9600); 
+               Arduino arduino = new Arduino("COM6", 9600); 
                arduino.openConnection();
                arduino.serialWrite(a, 1, 50);
                Thread t=
