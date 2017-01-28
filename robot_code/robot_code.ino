@@ -87,9 +87,9 @@ void testProcessData() {
         Serial.println(opt_angle);
         float delta = 0.0;
         float previous_angle = current_angle;
-        while(opt_angle > (previous_angle + 360.0 * rotations)) {
+        while(formatOptAngle(opt_angle, previous_angle) > (previous_angle + 360.0 * rotations)) {
           current_angle = getRobotAngle();
-          delta = current_angle - previous_angle;
+          delta = abs(current_angle - previous_angle);
           if(delta > 180.0) {
             rotations += 1;
           }
@@ -97,8 +97,7 @@ void testProcessData() {
           R2.write(180);
           R1.write(180);
           L2.write(180);
-          previous_angle = getRobotAngle();
-          Serial.println(previous_angle);
+          previous_angle = current_angle;
         }
         
       } else {
@@ -128,5 +127,12 @@ float getRobotAngle() {
   bno.getEvent(&event1);
   float current_angle = fmod(event1.orientation.x + 5.0, 360.0);
   return current_angle;
+}
+
+float formatOptAngle(opt, real) {
+  if(opt < real) {
+    opt += 360.0
+  }
+  return opt;
 }
 
