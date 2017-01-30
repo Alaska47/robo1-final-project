@@ -13,6 +13,8 @@ Servo R2, L1, L2, R1;
 
 String data = "";
 
+float offset = 0.0;
+
 void setup()
 {
   // Set up both ports at 9600 baud. This value is most important
@@ -72,6 +74,7 @@ void testProcessData() {
   char charBuf[data.length() + 1];
   data.toCharArray(charBuf, data.length());
   char* command = strtok(charBuf, ",");
+  offset = getOffset();
   while (command != 0)
   {   
       String com = String(command);
@@ -80,7 +83,7 @@ void testProcessData() {
         float angle = com.toInt() / 1.0;
         Serial.println(angle);
         float current_angle = getRobotAngle();
-        float opt_angle = current_angle + angle + 5.0;
+        float opt_angle = current_angle + angle;
         Serial.print("Current Angle: ");
         Serial.println(current_angle);
         Serial.print("Opt: ");
@@ -125,8 +128,15 @@ void testProcessData() {
 float getRobotAngle() {
   sensors_event_t event1;
   bno.getEvent(&event1);
-  float current_angle = fmod(event1.orientation.x + 5.0, 360.0);
+  float current_angle = fmod(event1.orientation.x + offset, 360.0);
   return current_angle;
+}
+
+
+float getOffset() {
+  sensors_event_t event1;
+  bno.getEvent(&event1);
+  return 361.0 - event1.orientation.x;
 }
 
 float formatOptAngle(opt, real) {
